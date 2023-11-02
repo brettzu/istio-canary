@@ -94,7 +94,7 @@ spec:
   http:
   - match:
     - uri:
-        exact: /{{.Values.name}}
+        exact: /{{.Values.canaryName}}
     rewrite:
       uri: /color/index.html
     route:
@@ -117,7 +117,7 @@ spec:
   http:
   - match:
     - uri:
-        exact: /{{.Values.name}}
+        exact: /{{.Values.stableName}}
     rewrite:
       uri: /color/index.html
     route:
