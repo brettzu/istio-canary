@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{.Values.frontend.uiPath}}
   annotations:
-    harness.io/direct-apply: true
+    harness.io/direct-apply: "true"
 spec:
   replicas: 1
   selector:
@@ -23,13 +23,13 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: LOAD_BALANCER
-          value: {{.Values.frontend.loadBalancer}}
+          value: https://{{.Values.host}}
         - name: ENDPOINT
-          value: {{.Values.endpoint}}
+          value: {{.Values.name}}
         - name: TARGET1
-          value: {{.Values.canaryEndpoint}}
+          value: {{.Values.canaryName}}
         - name: TARGET2
-          value: {{.Values.stableEndpoint}}
+          value: {{.Values.stableName}}
         - name: TITLE
           value: {{.Values.frontend.title}}
         - name: UI_PATH
@@ -59,22 +59,3 @@ spec:
   selector:
     app: {{.Values.frontend.uiPath}}
   type: ClusterIP
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: {{.Values.frontend.uiPath}}
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - {{.Values.name}}
-  http:
-  - match:
-    - uri:
-        prefix: /{{.Values.frontend.uiPath}}
-    rewrite:
-      uri: /
-    route:
-    - destination:
-        host: {{.Values.frontend.uiPath}}

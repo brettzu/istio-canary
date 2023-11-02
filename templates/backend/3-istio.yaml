@@ -11,7 +11,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "*"
+    - {{.Values.host}}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -20,12 +20,12 @@ metadata:
 spec:
   host: {{.Values.name}}
   subsets:
-  - labels:
+  - name: canary
+    labels:
       harness.io/track: canary
-    name: canary
-  - labels:
+  - name: stable
+    labels:
       harness.io/track: stable
-    name: stable
 ---
 #
 # Main ingress for the backend that will split between stable and canary during deployment
@@ -36,13 +36,13 @@ metadata:
   name: {{.Values.name}}
 spec:
   hosts:
-  - "*"
+  - {{.Values.host}}
   gateways:
   - {{.Values.name}}
   http:
   - match:
     - uri:
-        exact: /{{.Values.endpoint}}
+        exact: /{{.Values.name}}
     rewrite:
       uri: /color/index.html
     route:
@@ -66,18 +66,19 @@ metadata:
   name: {{.Values.canaryName}}
 spec:
   hosts:
-  - "*"
+  - {{.Values.host}}
   gateways:
   - {{.Values.name}}
   http:
   - match:
     - uri:
-        exact: /{{.Values.canaryEndpoint}}
+        exact: /{{.Values.name}}
     rewrite:
       uri: /color/index.html
     route:
     - destination:
-        host: {{.Values.canaryName}}
+        host: {{.Values.name}}
+        subset: canary
 ---
 #
 # Dedicated ingress for stable
@@ -88,15 +89,16 @@ metadata:
   name: {{.Values.stableName}}
 spec:
   hosts:
-  - "*"
+  - {{.Values.host}}
   gateways:
   - {{.Values.name}}
   http:
   - match:
     - uri:
-        exact: /{{.Values.stableEndpoint}}
+        exact: /{{.Values.name}}
     rewrite:
       uri: /color/index.html
     route:
     - destination:
-        host: {{.Values.stableName}}
+        host: {{.Values.name}}
+        subset: stable

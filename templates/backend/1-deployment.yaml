@@ -18,9 +18,9 @@ spec:
         app: {{.Values.name}}
     spec:
       containers:
-      - name: color
+      - name: {{.Values.name}}
         image: {{.Values.image}}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         readinessProbe:
           httpGet:
             path: /color
