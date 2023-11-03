@@ -28,28 +28,6 @@ spec:
       harness.io/track: stable
 ---
 #
-# Ingress for the UI
-#
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: {{.Values.frontend.uiPath}}
-spec:
-  hosts:
-  - {{.Values.host}}
-  gateways:
-  - {{.Values.name}}
-  http:
-  - match:
-    - uri:
-        prefix: /{{.Values.frontend.uiPath}}
-    rewrite:
-      uri: /
-    route:
-    - destination:
-        host: {{.Values.frontend.uiPath}}
----
-#
 # Main ingress for the backend that will split between stable and canary during deployment
 #
 apiVersion: networking.istio.io/v1alpha3
